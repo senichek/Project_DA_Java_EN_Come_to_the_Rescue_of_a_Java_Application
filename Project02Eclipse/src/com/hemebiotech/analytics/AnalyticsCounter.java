@@ -9,10 +9,10 @@ public class AnalyticsCounter {
 
 		DataProcessor dataProcessor = new DataProcessorImpl();
 
-		List<String> symptoms = dataProcessor.GetSymptoms("Project02Eclipse/symptoms.txt");
+		List<String> symptoms = dataProcessor.getSymptoms("Project02Eclipse/symptoms.txt");
 
-		Map<String, Integer> processedData = dataProcessor.CalculateOccurence(symptoms);
+		Map<String, Integer> processedData = dataProcessor.calculateOccurence(symptoms);
 
-		dataProcessor.WriteToFile(processedData, "Project02Eclipse/results.out");
+		dataProcessor.writeToFile(processedData, "Project02Eclipse/results.out");
 	}
 }

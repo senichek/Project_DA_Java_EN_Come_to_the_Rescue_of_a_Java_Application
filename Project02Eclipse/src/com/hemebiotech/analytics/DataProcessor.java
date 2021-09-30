@@ -1,6 +1,5 @@
 package com.hemebiotech.analytics;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -15,13 +14,23 @@ import java.util.Map;
 public interface DataProcessor {
 	/**
 	 * If no data is available, return an empty List
-	 * 
-	 * @return a raw listing of all Symptoms obtained from a data source, duplicates
+	 * @param filepath	Location of the file you want to read the data from.
+	 * @return 			A raw listing of all Symptoms obtained from a data source, duplicates
 	 *         are possible/probable
 	 */
-	List<String> GetSymptoms(String filepath);
+	List<String> getSymptoms(String filepath);
 
-	Map<String, Integer> CalculateOccurence(List<String> symptoms);
+	/** 
+	 * Calculates the number/amount of occurences of each symptom 
+	 * @param symptoms 	The collection of symptoms.
+	 * @return 			An alphabetically ordered Map of symptom as a key and an amount of occurences as a value.
+	*/
+	Map<String, Integer> calculateOccurence(List<String> symptoms);
 
-	void WriteToFile(Map<String, Integer> data, String filePath) throws IOException;
+	/** 
+	 * Writes the data/collection to a file
+	 * @param data 		A collection of symptoms.
+	 * @param filePath	The path to the file you want to write to.
+	*/
+	void writeToFile(Map<String, Integer> data, String filePath);
 }

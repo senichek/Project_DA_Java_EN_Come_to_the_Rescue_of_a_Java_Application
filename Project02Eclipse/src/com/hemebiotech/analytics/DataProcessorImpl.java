@@ -12,32 +12,44 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DataProcessorImpl implements DataProcessor {
 
-	/*
-	 * Removed "Parameterized Constructor", if we pass the filepath to the function
-	 * instead of the Constructor it will let us be more flexible, I guess;
-	 */
+/** 
+ * Implementation of DataProcessor Interface
+*/
+public class DataProcessorImpl implements DataProcessor {
 
 	public DataProcessorImpl() {
 	}
 
+	/**
+	 * If no data is available, return an empty List
+	 * @param filepath	Location of the file you want to read the data from.
+	 * @return 			A raw listing of all Symptoms obtained from a data source, duplicates
+	 *         			are possible/probable
+	 */
 	@Override
-	public List<String> GetSymptoms(String filepath) {
+	public List<String> getSymptoms(String filepath) {
+		BufferedReader reader = null;
 		ArrayList<String> result = new ArrayList<String>();
 
 		if (filepath != null) {
 			try {
-				BufferedReader reader = new BufferedReader(new FileReader(filepath));
+				reader = new BufferedReader(new FileReader(filepath));
 				String line = reader.readLine();
 
 				while (line != null) {
 					result.add(line);
 					line = reader.readLine();
 				}
-				reader.close();
 			} catch (IOException e) {
 				e.printStackTrace();
+			} finally {
+				try {
+					reader.close();
+				} catch (IOException e) {
+					System.out.println("Error closing BufferedReader.");
+					e.printStackTrace();
+				}
 			}
 		}
 
@@ -46,8 +58,13 @@ public class DataProcessorImpl implements DataProcessor {
 		return result;
 	}
 
+	/** 
+	 * Calculates the number/amount of occurences of each symptom 
+	 * @param symptoms 	The collection of symptoms.
+	 * @return 			An alphabetically ordered Map of symptom as a key and an amount of occurences as a value.
+	*/
 	@Override
-	public Map<String, Integer> CalculateOccurence(List<String> symptoms) {
+	public Map<String, Integer> calculateOccurence(List<String> symptoms) {
 		// LinkedHashMap maintains insertion order, so that the alphabetical order of
 		// symptoms remains preserved;
 		Map<String, Integer> result = new LinkedHashMap<>();
@@ -59,27 +76,40 @@ public class DataProcessorImpl implements DataProcessor {
 		return result;
 	}
 
+	/** 
+	 * Writes the data/collection to a file
+	 * @param data 		A collection of symptoms.
+	 * @param filePath	The path to the file you want to write to.
+	*/
 	@Override
-	public void WriteToFile(Map<String, Integer> data, String filepath) throws IOException {
+	public void writeToFile(Map<String, Integer> data, String filepath) {
 		File file = new File(filepath);
-		if (!file.exists()) {
-			file.createNewFile();
-		}
-		FileWriter fileWriter = new FileWriter(file);
-		BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+		FileWriter fileWriter = null;
+		BufferedWriter bufferedWriter = null;
 
-		data.forEach((key, value) -> {
-			try {
-				bufferedWriter.write(key + "=" + value);
+		try {
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			
+			fileWriter = new FileWriter(file);
+			bufferedWriter = new BufferedWriter(fileWriter);
+
+			for (Map.Entry<String, Integer> entry : data.entrySet()) {
+				bufferedWriter.write(entry.getKey() + "=" + entry.getValue());
 				bufferedWriter.newLine();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				bufferedWriter.close();
+				fileWriter.close();
 			} catch (IOException e) {
-				System.out.println("Couldn't write to file. Error!");
+				System.out.println("Error closing FileWriter or BufferedWriter.");
 				e.printStackTrace();
 			}
-		});
-
-		bufferedWriter.close();
-		fileWriter.close();
+		}
 		System.out.println("The data has been written to file");
 	}
 }
